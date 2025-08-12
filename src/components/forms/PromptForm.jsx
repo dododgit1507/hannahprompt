@@ -15,11 +15,14 @@ export default function PromptForm({ onSubmit }) {
   // Estados para reconocimiento de voz
   const [isListening, setIsListening] = useState({
     objetivo: false,
-    reto: false
+    reto: false,
+    principal: false // Para el micrófono principal
   });
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [microphoneStatus, setMicrophoneStatus] = useState('unknown'); // 'unknown', 'granted', 'denied', 'prompt'
+  const [audioCompleto, setAudioCompleto] = useState(''); // Para guardar el audio interpretado completo
+  const [procesandoAudio, setProcesandoAudio] = useState(false); // Estado de procesamiento con GPT
   const recognitionRef = useRef(null);
 
   // Función para diagnosticar el estado del micrófono
@@ -52,6 +55,196 @@ export default function PromptForm({ onSubmit }) {
       } else {
         alert(`🔧 ERROR TÉCNICO\n\nDetalles: ${error.name} - ${error.message}\n\nInténtalo:\n• Reiniciar el navegador\n• Verificar configuración de audio\n• Probar con otro navegador`);
       }
+    }
+  };
+
+  // Función para procesar audio completo con GPT
+  const procesarAudioConGPT = async (textoCompleto) => {
+    setProcesandoAudio(true);
+    
+    try {
+      const prompt = `Eres un experto analizador de ideas de negocio. Tu tarea es interpretar lo que dice el usuario y extraer automáticamente:
+
+1. ÁREA PRINCIPAL DEL NEGOCIO (debe ser exactamente uno de estos IDs):
+   - marketing
+   - programacion
+   - finanzas
+   - recursos-humanos
+   - atencion-cliente
+   - educacion
+   - salud
+   - creatividad
+
+2. OBJETIVO O TEMA PRINCIPAL: Una descripción clara y específica del objetivo empresarial
+
+3. RETO ESPECÍFICO: Si menciona algún desafío particular (puede estar vacío)
+
+ENTRADA DEL USUARIO: "${textoCompleto}"
+
+Responde ÚNICAMENTE en formato JSON con esta estructura exacta:
+{
+  "areaNegocio": "ID_DEL_AREA",
+  "objetivo": "descripción del objetivo",
+  "reto": "descripción del reto o cadena vacía"
+}
+
+IMPORTANTE: 
+- areaNegocio debe ser exactamente uno de los IDs listados
+- objetivo nunca debe estar vacío
+- reto puede estar vacío si no se menciona ningún desafío
+- No agregues explicaciones adicionales, solo el JSON`;
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Eres un experto en análisis de ideas empresariales. Extraes información estructurada de descripciones de negocio y respondes únicamente en formato JSON válido.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.1,
+          max_tokens: 300
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error de API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const resultado = data.choices[0].message.content;
+      
+      // Limpiar respuesta de markdown si está presente
+      let jsonLimpio = resultado;
+      if (resultado.includes('```json')) {
+        jsonLimpio = resultado.replace(/```json\s*/, '').replace(/\s*```$/, '');
+      } else if (resultado.includes('```')) {
+        jsonLimpio = resultado.replace(/```\s*/, '').replace(/\s*```$/, '');
+      }
+      
+      const datosExtraidos = JSON.parse(jsonLimpio);
+      
+      // Validar que el área de negocio sea válida
+      const areasValidas = ['marketing', 'programacion', 'finanzas', 'recursos-humanos', 'atencion-cliente', 'educacion', 'salud', 'creatividad'];
+      if (!areasValidas.includes(datosExtraidos.areaNegocio)) {
+        datosExtraidos.areaNegocio = 'marketing'; // Default fallback
+      }
+      
+      // Actualizar el formulario con los datos extraídos
+      setFormData(prev => ({
+        ...prev,
+        areaNegocio: datosExtraidos.areaNegocio,
+        objetivo: datosExtraidos.objetivo || '',
+        reto: datosExtraidos.reto || ''
+      }));
+      
+      // Guardar el audio completo
+      setAudioCompleto(textoCompleto);
+      
+      // Mostrar éxito
+      alert('✅ INTERPRETACIÓN EXITOSA\n\n' +
+            `📊 Área detectada: ${areasNegocio.find(a => a.id === datosExtraidos.areaNegocio)?.nombre}\n` +
+            `🎯 Objetivo: ${datosExtraidos.objetivo}\n` +
+            `⚡ Reto: ${datosExtraidos.reto || 'Ninguno especificado'}\n\n` +
+            'Los campos se han rellenado automáticamente. Puedes editarlos si es necesario.');
+      
+    } catch (error) {
+      console.error('Error procesando audio con GPT:', error);
+      alert('❌ ERROR AL INTERPRETAR\n\n' +
+            'No se pudo procesar automáticamente tu descripción.\n\n' +
+            'Puedes:\n' +
+            '• Usar los micrófonos individuales en cada campo\n' +
+            '• Escribir manualmente la información\n' +
+            '• Intentar con una descripción más clara\n\n' +
+            `Texto capturado: "${textoCompleto}"`);
+    } finally {
+      setProcesandoAudio(false);
+    }
+  };
+
+  // Función específica para el micrófono principal
+  const toggleMicrofonoPrincipal = async () => {
+    if (!voiceSupported) {
+      alert('❌ Tu navegador no soporta reconocimiento de voz.\n\nNavegadores compatibles:\n• Google Chrome\n• Microsoft Edge\n• Safari (iOS/macOS)\n\nPor favor, usa uno de estos navegadores.');
+      return;
+    }
+
+    if (isListening.principal) {
+      // Detener reconocimiento
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(prev => ({ ...prev, principal: false }));
+      return;
+    }
+
+    try {
+      // Configurar reconocimiento para captura más larga
+      if (!recognitionRef.current) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognitionRef.current = new SpeechRecognition();
+      }
+      
+      recognitionRef.current.continuous = true; // Permitir captura continua
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'es-ES';
+      recognitionRef.current.maxAlternatives = 1;
+
+      let textoCompleto = '';
+
+      recognitionRef.current.onstart = () => {
+        console.log('✅ Micrófono principal iniciado');
+        setIsListening(prev => ({ ...prev, principal: true }));
+      };
+
+      recognitionRef.current.onresult = (event) => {
+        // Acumular todos los resultados
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            textoCompleto += event.results[i][0].transcript + ' ';
+          }
+        }
+        console.log('🎤 Texto acumulado:', textoCompleto);
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('❌ Error en micrófono principal:', event.error);
+        setIsListening(prev => ({ ...prev, principal: false }));
+        
+        if (event.error === 'not-allowed') {
+          alert('🔒 PERMISOS DE MICRÓFONO DENEGADOS\n\nPara usar esta función:\n1. Busca el ícono 🔒 o 🎤 en la barra de direcciones\n2. Haz clic y selecciona "Permitir"\n3. Recarga la página después de dar permisos');
+        } else if (event.error === 'no-speech') {
+          alert('🤫 NO SE DETECTÓ HABLA\n\nInténtalo de nuevo hablando más claro y fuerte.');
+        }
+      };
+
+      recognitionRef.current.onend = () => {
+        console.log('🔚 Micrófono principal terminado');
+        setIsListening(prev => ({ ...prev, principal: false }));
+        
+        if (textoCompleto.trim()) {
+          console.log('📝 Procesando con GPT:', textoCompleto);
+          procesarAudioConGPT(textoCompleto.trim());
+        }
+      };
+
+      // Iniciar reconocimiento
+      recognitionRef.current.start();
+      
+    } catch (error) {
+      console.error('💥 Error crítico en micrófono principal:', error);
+      setIsListening(prev => ({ ...prev, principal: false }));
+      alert(`🔧 ERROR TÉCNICO\n\nDetalles: ${error.message}\n\nSoluciones:\n• Recarga la página\n• Verifica permisos de micrófono\n• Intenta con otro navegador`);
     }
   };
 
@@ -281,6 +474,96 @@ export default function PromptForm({ onSubmit }) {
 
       {/* Formulario */}
       <form onSubmit={handleSubmit} className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+        
+        {/* NUEVO: Micrófono Principal - Interpretación Automática con IA */}
+        {voiceSupported && (
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 sm:p-6 border-2 border-indigo-200 shadow-lg">
+            <div className="text-center">
+              <div className="flex flex-col items-center gap-4">
+                <h3 className="text-lg sm:text-xl font-bold text-indigo-800 flex items-center gap-2">
+                  🤖✨ Interpretación Automática con IA
+                </h3>
+                <p className="text-indigo-700 text-sm sm:text-base max-w-2xl">
+                  <strong>¡Novedad!</strong> Describe tu idea de negocio completa y la IA rellenará automáticamente todos los campos
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={toggleMicrofonoPrincipal}
+                    disabled={procesandoAudio}
+                    className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-bold text-white transition-all duration-300 shadow-lg transform ${
+                      isListening.principal
+                        ? 'bg-red-500 hover:bg-red-600 animate-pulse scale-110'
+                        : procesandoAudio
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 hover:scale-105'
+                    }`}
+                  >
+                    <span className="text-2xl">
+                      {isListening.principal ? '🔴' : procesandoAudio ? '⏳' : '🎤'}
+                    </span>
+                    <span className="text-sm sm:text-base">
+                      {isListening.principal 
+                        ? 'GRABANDO - Haz clic para parar' 
+                        : procesandoAudio 
+                        ? 'Procesando con GPT...' 
+                        : 'Hablar Idea Completa'
+                      }
+                    </span>
+                  </button>
+                  
+                  {audioCompleto && (
+                    <div className="bg-white rounded-lg p-3 border border-indigo-200 max-w-md">
+                      <p className="text-xs text-indigo-600 font-medium mb-1">Última captura:</p>
+                      <p className="text-xs text-gray-700 truncate">"{audioCompleto}"</p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="bg-indigo-100 rounded-xl p-4 border border-indigo-200">
+                  <h4 className="font-bold text-indigo-800 text-sm mb-2">💡 Cómo usar:</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-indigo-700">
+                    <div className="text-center">
+                      <div className="font-medium">1️⃣ Habla</div>
+                      <div>"Quiero hacer marketing digital para mi restaurante pero tengo poco presupuesto"</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium">2️⃣ IA Procesa</div>
+                      <div>GPT interpreta y extrae la información</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium">3️⃣ Auto-Rellena</div>
+                      <div>Los campos se completan automáticamente</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {isListening.principal && (
+                  <div className="animate-pulse text-red-600 font-bold text-sm">
+                    🔴 GRABANDO... Describe tu idea de negocio completa
+                  </div>
+                )}
+                
+                {procesandoAudio && (
+                  <div className="animate-pulse text-purple-600 font-bold text-sm">
+                    🤖 GPT está interpretando tu idea... Por favor espera
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Separador visual */}
+        {voiceSupported && (
+          <div className="flex items-center justify-center my-8">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            <span className="px-4 text-gray-500 text-sm font-medium">o completa manualmente</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+          </div>
+        )}
+
         {/* Instrucciones específicas de voz */}
         {voiceSupported && (
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-200 mb-6 sm:mb-8">
