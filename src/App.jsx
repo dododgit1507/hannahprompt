@@ -53,13 +53,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+        <div className="text-center mb-6 sm:mb-10">
+          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2 sm:mb-4">
             🚀 HannahPrompts
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-gray-600 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed px-4">
             Crea prompts perfectos con nuestro sistema de 3 agentes especializados que trabajan en secuencia para optimizar tu consulta
           </p>
         </div>
@@ -74,11 +74,11 @@ function App() {
         {vistaActual === 'procesando' && (
           // Vista de procesamiento en pantalla completa
           <div className="max-w-6xl mx-auto">
-            <div className="mb-6 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">Procesando con IA...</h2>
+            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Procesando con IA...</h2>
               <button
                 onClick={volverAlFormulario}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm sm:text-base"
               >
                 ← Volver al formulario
               </button>

@@ -242,21 +242,21 @@ export default function PromptForm({ onSubmit }) {
   const isValid = formData.areaNegocio && formData.objetivo;
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden max-w-4xl mx-auto">
       {/* Header del formulario */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-6">
-        <h2 className="text-2xl font-bold text-white mb-2">
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
           🚀 Optimizador de Prompts para tu Negocio
         </h2>
-        <p className="text-emerald-100 text-sm">
+        <p className="text-emerald-100 text-xs sm:text-sm">
           Responde 3 preguntas y obtén el prompt perfecto para tu objetivo empresarial
         </p>
         
         {/* Indicador de soporte de voz */}
         {voiceSupported && (
-          <div className="mt-3 p-3 bg-emerald-500/10 rounded-lg border border-emerald-300">
-            <div className="flex items-center gap-2 text-emerald-100 text-sm mb-2">
-              <span className="text-lg">🎤</span>
+          <div className="mt-3 p-2 sm:p-3 bg-emerald-500/10 rounded-lg border border-emerald-300">
+            <div className="flex items-center gap-2 text-emerald-100 text-xs sm:text-sm mb-2">
+              <span className="text-base sm:text-lg">🎤</span>
               <span className="font-medium">Reconocimiento de Voz Activado</span>
             </div>
             <p className="text-emerald-100 text-xs">
@@ -267,9 +267,9 @@ export default function PromptForm({ onSubmit }) {
         )}
         
         {!voiceSupported && (
-          <div className="mt-3 p-3 bg-orange-500/10 rounded-lg border border-orange-300">
-            <div className="flex items-center gap-2 text-orange-100 text-sm mb-2">
-              <span className="text-lg">⚠️</span>
+          <div className="mt-3 p-2 sm:p-3 bg-orange-500/10 rounded-lg border border-orange-300">
+            <div className="flex items-center gap-2 text-orange-100 text-xs sm:text-sm mb-2">
+              <span className="text-base sm:text-lg">⚠️</span>
               <span className="font-medium">Reconocimiento de Voz No Disponible</span>
             </div>
             <p className="text-orange-100 text-xs">
@@ -280,20 +280,20 @@ export default function PromptForm({ onSubmit }) {
       </div>
 
       {/* Formulario */}
-      <form onSubmit={handleSubmit} className="p-8 space-y-8">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
         {/* Instrucciones específicas de voz */}
         {voiceSupported && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200 mb-8">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-200 mb-6 sm:mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm">
                 💡
               </div>
-              <h3 className="font-bold text-blue-800">Guía Rápida: Reconocimiento de Voz</h3>
+              <h3 className="font-bold text-blue-800 text-sm sm:text-base">Guía Rápida: Reconocimiento de Voz</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-white rounded-lg p-4 border border-blue-100">
-                <h4 className="font-bold text-blue-700 mb-2">🎤 Cómo Activar</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 text-sm">
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-100">
+                <h4 className="font-bold text-blue-700 mb-2 text-xs sm:text-sm">🎤 Cómo Activar</h4>
                 <ul className="text-blue-600 space-y-1 text-xs">
                   <li>• Haz clic en el botón 🎤 verde</li>
                   <li>• El navegador pedirá permisos</li>
@@ -302,8 +302,8 @@ export default function PromptForm({ onSubmit }) {
                 </ul>
               </div>
               
-              <div className="bg-white rounded-lg p-4 border border-blue-100">
-                <h4 className="font-bold text-blue-700 mb-2">🗣️ Consejos para Hablar</h4>
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-100">
+                <h4 className="font-bold text-blue-700 mb-2 text-xs sm:text-sm">🗣️ Consejos para Hablar</h4>
                 <ul className="text-blue-600 space-y-1 text-xs">
                   <li>• Habla claro y pausado</li>
                   <li>• Acércate al micrófono</li>
@@ -313,15 +313,15 @@ export default function PromptForm({ onSubmit }) {
               </div>
             </div>
             
-            <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-              <div className="flex items-center justify-between">
-                <p className="text-yellow-700 text-xs">
+            <div className="mt-4 p-2 sm:p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <p className="text-yellow-700 text-xs flex-1">
                   <strong>⚠️ Si no funciona:</strong> Verifica que el ícono 🔒 o 🎤 en la barra de direcciones no esté bloqueando el micrófono.
                 </p>
                 <button
                   type="button"
                   onClick={diagnosticarMicrofono}
-                  className="ml-3 px-3 py-1 bg-yellow-600 text-white text-xs rounded-lg hover:bg-yellow-700 transition-colors"
+                  className="px-3 py-1 bg-yellow-600 text-white text-xs rounded-lg hover:bg-yellow-700 transition-colors whitespace-nowrap"
                 >
                   🔍 Diagnosticar
                 </button>
@@ -348,27 +348,27 @@ export default function PromptForm({ onSubmit }) {
         {/* Pregunta 1: Área Principal del Negocio */}
         <div className="space-y-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm">
               1
             </div>
-            <label className="text-lg font-bold text-gray-900">
+            <label className="text-base sm:text-lg font-bold text-gray-900">
               Área Principal de tu Negocio
             </label>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {areasNegocio.map((area) => (
               <button
                 key={area.id}
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, areaNegocio: area.id }))}
-                className={`p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md flex items-center gap-3 ${
+                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md flex items-center gap-3 ${
                   formData.areaNegocio === area.id
                     ? 'border-emerald-500 bg-emerald-50 shadow-md'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <span className="text-2xl">{area.icon}</span>
-                <span className="font-medium text-gray-900">{area.nombre}</span>
+                <span className="text-xl sm:text-2xl">{area.icon}</span>
+                <span className="font-medium text-gray-900 text-sm sm:text-base">{area.nombre}</span>
               </button>
             ))}
           </div>
@@ -377,10 +377,10 @@ export default function PromptForm({ onSubmit }) {
         {/* Pregunta 2: Objetivo o Tema Principal */}
         <div className="space-y-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm">
               2
             </div>
-            <label className="text-lg font-bold text-gray-900">
+            <label className="text-base sm:text-lg font-bold text-gray-900">
               Describe tu Objetivo o Tema Principal
             </label>
           </div>
@@ -389,7 +389,7 @@ export default function PromptForm({ onSubmit }) {
               value={formData.objetivo}
               onChange={(e) => setFormData(prev => ({ ...prev, objetivo: e.target.value }))}
               placeholder="Ejemplo: Crear una estrategia de marketing digital para lanzar un nuevo producto"
-              className="w-full h-24 p-4 pr-16 border-2 border-gray-200 rounded-xl resize-none focus:border-emerald-500 focus:outline-none transition-colors text-gray-900 placeholder-gray-500"
+              className="w-full h-20 sm:h-24 p-4 pr-12 sm:pr-16 border-2 border-gray-200 rounded-xl resize-none focus:border-emerald-500 focus:outline-none transition-colors text-gray-900 placeholder-gray-500 text-sm sm:text-base"
             />
             
             {/* Botón de micrófono para objetivo */}
@@ -483,12 +483,12 @@ export default function PromptForm({ onSubmit }) {
 
         {/* Vista previa del modelo seleccionado automáticamente */}
         {formData.areaNegocio && formData.objetivo && (
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
+          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-purple-200">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm">
                 🤖
               </div>
-              <h3 className="font-bold text-purple-800">Modelo IA Recomendado Automáticamente</h3>
+              <h3 className="font-bold text-purple-800 text-sm sm:text-base">Modelo IA Recomendado Automáticamente</h3>
             </div>
             {(() => {
               const seleccion = selectorModelo.analizarYSeleccionar(
@@ -524,15 +524,15 @@ export default function PromptForm({ onSubmit }) {
 
         {/* Selección manual del modelo */}
         {formData.areaNegocio && formData.objetivo && (
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200">
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 sm:p-6 border border-blue-200">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm">
                 ⚙️
               </div>
-              <h3 className="font-bold text-blue-800">¿Prefieres otro modelo? (Opcional)</h3>
+              <h3 className="font-bold text-blue-800 text-sm sm:text-base">¿Prefieres otro modelo? (Opcional)</h3>
             </div>
             
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { id: 'gpt-4', name: 'GPT-4', desc: 'Razonamiento lógico', icon: '🧠' },
                 { id: 'claude-3-opus', name: 'Claude 3 Opus', desc: 'Creatividad avanzada', icon: '🎨' },
@@ -574,11 +574,11 @@ export default function PromptForm({ onSubmit }) {
         )}
 
         {/* Botón de envío */}
-        <div className="pt-6">
+        <div className="pt-4 sm:pt-6">
           <button
             type="submit"
             disabled={!isValid}
-            className={`w-full py-4 px-6 rounded-xl font-bold text-white transition-all duration-200 ${
+            className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-bold text-white transition-all duration-200 text-sm sm:text-base ${
               isValid
                 ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg hover:shadow-xl'
                 : 'bg-gray-300 cursor-not-allowed'
@@ -592,30 +592,30 @@ export default function PromptForm({ onSubmit }) {
         </div>
 
         {/* Información adicional */}
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
-          <h3 className="font-bold text-emerald-800 mb-3 flex items-center gap-2">
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 sm:p-6 border border-emerald-200">
+          <h3 className="font-bold text-emerald-800 mb-3 flex items-center gap-2 text-sm sm:text-base">
             <span>🤖</span> Proceso de Optimización con 4 Agentes IA
           </h3>
-          <div className="grid grid-cols-4 gap-3 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm">
             <div className="text-center">
-              <div className="w-8 h-8 bg-emerald-500 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">1</div>
-              <div className="font-medium text-emerald-800">Análisis</div>
-              <div className="text-emerald-600">Estructuración</div>
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">1</div>
+              <div className="font-medium text-emerald-800 text-xs sm:text-sm">Análisis</div>
+              <div className="text-emerald-600 text-xs">Estructuración</div>
             </div>
             <div className="text-center">
-              <div className="w-8 h-8 bg-emerald-500 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">2</div>
-              <div className="font-medium text-emerald-800">Creación</div>
-              <div className="text-emerald-600">Prompt base</div>
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">2</div>
+              <div className="font-medium text-emerald-800 text-xs sm:text-sm">Creación</div>
+              <div className="text-emerald-600 text-xs">Prompt base</div>
             </div>
             <div className="text-center">
-              <div className="w-8 h-8 bg-emerald-500 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">3</div>
-              <div className="font-medium text-emerald-800">Revisión</div>
-              <div className="text-emerald-600">Recomendaciones</div>
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">3</div>
+              <div className="font-medium text-emerald-800 text-xs sm:text-sm">Revisión</div>
+              <div className="text-emerald-600 text-xs">Recomendaciones</div>
             </div>
             <div className="text-center">
-              <div className="w-8 h-8 bg-emerald-600 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">4</div>
-              <div className="font-medium text-emerald-800">Implementa</div>
-              <div className="text-emerald-600">Versión final</div>
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-600 text-white rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-xs">4</div>
+              <div className="font-medium text-emerald-800 text-xs sm:text-sm">Implementa</div>
+              <div className="text-emerald-600 text-xs">Versión final</div>
             </div>
           </div>
         </div>
