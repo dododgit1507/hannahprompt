@@ -107,7 +107,7 @@ Responde ÚNICAMENTE en formato JSON válido, SIN markdown, SIN backticks. Solo 
           }
         ],
         temperature: 0.3,
-        max_tokens: 1500
+        max_tokens: 2500
       });
 
       const respuesta = response.choices[0].message.content;
